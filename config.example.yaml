@@ -1,22 +1,22 @@
-# QIIME2 + BLAST fish eDNA workflow configuration
+# QIIME2 + BLAST 鱼类环境 DNA 工作流配置
 project:
   name: fish_edna_demo
   output_dir: results
   threads: 8
 
 input:
-  # Directory containing paired-end FASTQ files in Casava 1.8 naming format.
+  # 存放双端 FASTQ 文件的目录，默认使用 Casava 1.8 命名格式。
   fastq_dir: data/fastq
   metadata: data/metadata.tsv
-  # One of: CasavaOneEightSingleLanePerSampleDirFmt, PairedEndFastqManifestPhred33V2
+  # 可选：CasavaOneEightSingleLanePerSampleDirFmt 或 PairedEndFastqManifestPhred33V2
   qiime_input_format: CasavaOneEightSingleLanePerSampleDirFmt
 
 manifest:
-  # Used only when qiime_input_format is PairedEndFastqManifestPhred33V2.
+  # 仅当 qiime_input_format 使用 PairedEndFastqManifestPhred33V2 时启用。
   make_manifest: false
 
 reference:
-  # Provide either fasta or an existing blast_db_prefix. If fasta is set, makeblastdb is run automatically.
+  # 提供 fasta 或已有 blast_db_prefix；设置 fasta 时会自动运行 makeblastdb。
   fasta: reference/fish_12s.fasta
   blast_db_prefix: null
   db_type: nucl
@@ -29,8 +29,7 @@ dada2:
   chimera_method: consensus
 
 taxonomy:
-  # Header parser: "simple" uses the first whitespace-delimited description after the id;
-  # "qiime" expects tabular taxonomy to be supplied separately in future extensions.
+  # 表头解析器：simple 使用序列 ID 后的描述作为分类信息；后续可扩展 qiime 表格注释。
   header_parser: simple
   unassigned_label: Unassigned
 

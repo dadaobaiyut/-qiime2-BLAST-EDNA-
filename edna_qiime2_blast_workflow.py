@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""QIIME 2 + BLAST workflow for fish eDNA diversity analysis."""
+"""用于鱼类环境 DNA 多样性分析的 QIIME 2 + BLAST 工作流。"""
 from __future__ import annotations
 
 import argparse
@@ -41,7 +41,7 @@ def parse_scalar(value: str) -> Any:
 
 
 def load_simple_yaml(path: Path) -> dict[str, Any]:
-    """Load the simple two-level YAML shape used by this workflow config."""
+    """读取本工作流配置使用的简单两级 YAML。"""
     data: dict[str, Any] = {}
     current_section: str | None = None
     with path.open("r", encoding="utf-8") as handle:
@@ -57,7 +57,7 @@ def load_simple_yaml(path: Path) -> dict[str, Any]:
                 key, value = line.strip().split(":", 1)
                 data[current_section][key.strip()] = parse_scalar(value.strip())
                 continue
-            raise ValueError(f"Unsupported config line: {raw_line.rstrip()}")
+            raise ValueError(f"不支持的配置行： {raw_line.rstrip()}")
     return data
 
 
@@ -83,7 +83,7 @@ def setup_logging(output_dir: Path) -> None:
 def require_tools(tools: list[str]) -> None:
     missing = [tool for tool in tools if shutil.which(tool) is None]
     if missing:
-        raise SystemExit(f"Missing required command(s): {', '.join(missing)}")
+        raise SystemExit(f"缺少必需命令： {', '.join(missing)}")
 
 
 def run_command(command: list[str], dry_run: bool = False) -> None:
@@ -107,13 +107,13 @@ def make_manifest(fastq_dir: Path, manifest_path: Path) -> None:
         sample_id, read = match.group(1), match.group(2)
         pairs.setdefault(sample_id, {})[read] = fastq.resolve()
     if not pairs:
-        raise SystemExit(f"No paired FASTQ files found in {fastq_dir}")
+        raise SystemExit(f"未找到双端 FASTQ 文件目录： {fastq_dir}")
     with manifest_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle, delimiter="\t")
         writer.writerow(["sample-id", "forward-absolute-filepath", "reverse-absolute-filepath"])
         for sample_id, reads in pairs.items():
             if "1" not in reads or "2" not in reads:
-                raise SystemExit(f"Sample {sample_id} does not have both R1 and R2 files")
+                raise SystemExit(f"Sample {sample_id} 缺少成对的 R1/R2 文件")
             writer.writerow([sample_id, reads["1"], reads["2"]])
 
 
@@ -182,7 +182,7 @@ def run_workflow(config_path: Path, dry_run: bool) -> None:
     reference_fasta = Path(reference_cfg["fasta"]) if reference_cfg.get("fasta") else None
     if not db_prefix:
         if reference_fasta is None:
-            raise SystemExit("reference.fasta or reference.blast_db_prefix is required")
+            raise SystemExit("必须设置 reference.fasta 或 reference.blast_db_prefix")
         db_prefix = str(blast_dir / "fish_reference")
         run_command(["makeblastdb", "-in", str(reference_fasta), "-dbtype", reference_cfg.get("db_type", "nucl"), "-out", db_prefix], dry_run)
 
@@ -199,7 +199,7 @@ def run_workflow(config_path: Path, dry_run: bool) -> None:
     taxonomy_tsv = blast_dir / "taxonomy.tsv"
     if not dry_run:
         if reference_fasta is None:
-            raise SystemExit("reference.fasta is required to convert BLAST IDs to taxonomy.tsv")
+            raise SystemExit("需要 reference.fasta 才能将 BLAST ID 转换为 taxonomy.tsv")
         convert_blast_to_taxonomy(blast_out, reference_fasta, taxonomy_tsv, raw)
     run_command(["qiime", "tools", "import", "--type", "FeatureData[Taxonomy]", "--input-format", "TSVTaxonomyFormat", "--input-path", str(taxonomy_tsv), "--output-path", str(cfg.output_dir / "taxonomy.qza")], dry_run)
     run_command(["qiime", "taxa", "barplot", "--i-table", str(cfg.output_dir / "table.qza"), "--i-taxonomy", str(cfg.output_dir / "taxonomy.qza"), "--m-metadata-file", str(metadata), "--o-visualization", str(cfg.output_dir / "taxa-bar-plots.qzv")], dry_run)
@@ -207,11 +207,12 @@ def run_workflow(config_path: Path, dry_run: bool) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a QIIME 2 + BLAST fish eDNA workflow")
+    parser = argparse.ArgumentParser(description="运行 QIIME 2 + BLAST 鱼类环境 DNA 工作流", add_help=False)
+    parser.add_argument("-h", "--help", action="help", help="显示帮助信息")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    run_parser = subparsers.add_parser("run", help="run the complete workflow")
-    run_parser.add_argument("--config", required=True, type=Path, help="YAML configuration file")
-    run_parser.add_argument("--dry-run", action="store_true", help="print commands without executing them")
+    run_parser = subparsers.add_parser("run", help="运行完整工作流")
+    run_parser.add_argument("--config", required=True, type=Path, help="YAML 配置文件")
+    run_parser.add_argument("--dry-run", action="store_true", help="只打印命令，不实际执行")
     args = parser.parse_args()
     if args.command == "run":
         run_workflow(args.config, args.dry_run)

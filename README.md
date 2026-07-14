@@ -1,17 +1,17 @@
-# QIIME2-BLAST-eDNA
+# QIIME2-BLAST-eDNA 中文版
 
 一个面向鱼类 eDNA 扩增子数据的可复现工作流模板，串联 **QIIME 2** 质控/ASV 构建与 **BLAST** 物种注释，输出鱼类多样性分析常用结果。
 
-> 目标：让用户准备好原始双端 FASTQ、元数据表、鱼类参考序列库后，用一个配置文件启动完整分析。
+> 目标：让用户准备好原始双端测序文件、元数据表、鱼类参考序列库后，用一个配置文件启动完整分析。
 
 ## 功能
 
 - 导入 Casava 1.8 格式双端测序数据到 QIIME 2。
-- 使用 DADA2 去噪、合并双端 reads、去嵌合体并生成 ASV 表和代表序列。
+- 使用 DADA2 去噪、合并双端序列、去嵌合体并生成 ASV 表和代表序列。
 - 导出 ASV 序列并用本地 BLAST 数据库进行物种注释。
-- 根据 BLAST 命中阈值生成 taxonomy TSV。
-- 导入 BLAST 注释到 QIIME 2 并生成 taxa barplot。
-- 生成核心多样性结果（alpha/beta diversity、PCoA、Emperor 可视化）。
+- 根据 BLAST 命中阈值生成物种注释 TSV。
+- 导入 BLAST 注释到 QIIME 2 并生成物种组成柱状图。
+- 生成核心多样性结果（α/β 多样性、PCoA、Emperor 可视化）。
 - 自动生成 `manifest.tsv`、运行日志和结果目录。
 
 ## 目录结构
@@ -56,7 +56,7 @@ sampleB_S2_L001_R2_001.fastq.gz
 
 ### 2. 元数据表
 
-QIIME 2 metadata TSV，例如：
+QIIME 2 元数据 TSV，例如：
 
 ```text
 sample-id	group	site
@@ -68,7 +68,7 @@ sampleB	impact	lake2
 
 ### 3. 鱼类参考库
 
-准备一个参考 FASTA，序列 header 建议包含物种名或可解析的分类信息，例如：
+准备一个参考 FASTA，序列表头建议包含物种名或可解析的分类信息，例如：
 
 ```text
 >NC_001 sample_taxonomy=k__Eukaryota;p__Chordata;c__Actinopteri;o__Cypriniformes;f__Cyprinidae;g__Cyprinus;s__Cyprinus_carpio
@@ -114,7 +114,7 @@ python edna_qiime2_blast_workflow.py run --config config.yaml --dry-run
 
 默认输出到 `results/`：
 
-- `manifest.tsv`：自动生成的 QIIME 2 manifest。
+- `manifest.tsv`：自动生成的 QIIME 2 清单文件。
 - `demux-paired-end.qza` / `demux.qzv`：导入后的原始序列和质量概览。
 - `table.qza`、`rep-seqs.qza`、`denoising-stats.qza`：DADA2 结果。
 - `blast/asv_vs_fish.tsv`：BLAST 原始注释结果。
@@ -128,7 +128,7 @@ python edna_qiime2_blast_workflow.py run --config config.yaml --dry-run
 见 [`config.example.yaml`](config.example.yaml)。关键参数包括：
 
 - `input.fastq_dir`：FASTQ 文件目录。
-- `input.metadata`：metadata TSV。
+- `input.metadata`：元数据 TSV。
 - `reference.fasta`：鱼类参考 FASTA；或设置 `reference.blast_db_prefix`。
 - `dada2.trunc_len_f` / `dada2.trunc_len_r`：根据 `demux.qzv` 质量图调整。
 - `blast.min_identity`、`blast.min_query_coverage`、`blast.max_evalue`：控制注释可信度。
@@ -139,7 +139,7 @@ python edna_qiime2_blast_workflow.py run --config config.yaml --dry-run
 - 先用 `--dry-run` 检查路径与命令。
 - 首次真实运行后打开 `demux.qzv` 查看质量图，再调整 DADA2 截断长度。
 - 鱼类 eDNA 常见片段较短，应使用与引物区域匹配的本地鱼类参考库；参考库质量会直接影响物种注释准确性。
-- 对 BLAST 注释建议同时设置 identity、query coverage 和 e-value 阈值，并人工复核生态上异常的物种。
+- 对 BLAST 注释建议同时设置相似度、查询覆盖度和期望值阈值，并人工复核生态上异常的物种。
 
 ## 注意
 
