@@ -1,0 +1,46 @@
+# QIIME2 + BLAST fish eDNA workflow configuration
+project:
+  name: fish_edna_demo
+  output_dir: results
+  threads: 8
+
+input:
+  # Directory containing paired-end FASTQ files in Casava 1.8 naming format.
+  fastq_dir: data/fastq
+  metadata: data/metadata.tsv
+  # One of: CasavaOneEightSingleLanePerSampleDirFmt, PairedEndFastqManifestPhred33V2
+  qiime_input_format: CasavaOneEightSingleLanePerSampleDirFmt
+
+manifest:
+  # Used only when qiime_input_format is PairedEndFastqManifestPhred33V2.
+  make_manifest: false
+
+reference:
+  # Provide either fasta or an existing blast_db_prefix. If fasta is set, makeblastdb is run automatically.
+  fasta: reference/fish_12s.fasta
+  blast_db_prefix: null
+  db_type: nucl
+
+dada2:
+  trunc_len_f: 220
+  trunc_len_r: 180
+  trim_left_f: 0
+  trim_left_r: 0
+  chimera_method: consensus
+
+taxonomy:
+  # Header parser: "simple" uses the first whitespace-delimited description after the id;
+  # "qiime" expects tabular taxonomy to be supplied separately in future extensions.
+  header_parser: simple
+  unassigned_label: Unassigned
+
+blast:
+  task: blastn
+  max_target_seqs: 10
+  max_evalue: 1e-20
+  min_identity: 97.0
+  min_query_coverage: 90.0
+
+diversity:
+  sampling_depth: 1000
+  metadata_category: group
