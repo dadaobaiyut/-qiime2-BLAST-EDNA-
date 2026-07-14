@@ -9,3 +9,6 @@ results
 *.fq.gz
 data
 reference
+uploads
+web_workflow.log
+config.yaml

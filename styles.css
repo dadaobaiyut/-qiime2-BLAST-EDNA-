@@ -141,3 +141,26 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospac
   .steps, .output-grid, .config-form { grid-template-columns: 1fr; }
   .footer { flex-direction: column; gap: 8px; }
 }
+
+.config-form .wide { grid-column: 1 / -1; }
+.form-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.form-actions button {
+  background: var(--primary);
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-weight: 850;
+  padding: 12px 18px;
+}
+.form-actions button:nth-child(2) { background: var(--primary-dark); }
+.form-actions button:nth-child(3) { background: #d97706; }
+.hint { color: var(--muted); line-height: 1.6; margin: 0; }
+.status-section pre {
+  background: #082f36;
+  border-radius: 24px;
+  color: #d7fff8;
+  min-height: 240px;
+  padding: 24px;
+  white-space: pre-wrap;
+}

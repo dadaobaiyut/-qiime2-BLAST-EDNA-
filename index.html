@@ -71,7 +71,7 @@
           <p>填写常用参数后复制 YAML 到本地 `config.yaml`，再用命令行启动工作流。</p>
         </div>
         <div class="builder">
-          <form id="config-form" class="config-form">
+          <form id="config-form" class="config-form" enctype="multipart/form-data">
             <label>项目名称<input name="projectName" value="fish_edna_project" /></label>
             <label>输出目录<input name="outputDir" value="results" /></label>
             <label>线程数<input name="threads" type="number" min="1" value="8" /></label>
@@ -83,6 +83,15 @@
             <label>BLAST 相似度阈值<input name="identity" type="number" min="0" max="100" step="0.1" value="97.0" /></label>
             <label>查询覆盖度阈值<input name="coverage" type="number" min="0" max="100" step="0.1" value="90.0" /></label>
             <label>抽平深度<input name="samplingDepth" type="number" min="1" value="1000" /></label>
+            <label class="wide">测序 FASTQ 文件<input name="fastqFiles" type="file" multiple accept=".fastq,.fq,.gz" /></label>
+            <label>元数据文件<input name="metadataFile" type="file" accept=".tsv,.txt" /></label>
+            <label>参考库 FASTA<input name="referenceFile" type="file" accept=".fasta,.fa,.fna,.gz" /></label>
+            <div class="form-actions wide">
+              <button id="upload-data" type="button">上传并生成配置</button>
+              <button id="dry-run" type="button">预览命令</button>
+              <button id="run-workflow" type="button">开始分析</button>
+            </div>
+            <p class="hint wide">所有文件只会保存到本机或本地 Docker 容器挂载目录，无需登录远程平台。</p>
           </form>
           <div class="yaml-panel">
             <div class="panel-title"><span>config.yaml</span><button id="copy-config" type="button">复制</button></div>
@@ -104,6 +113,15 @@
           <div><strong>taxa-bar-plots.qzv</strong><span>物种组成可视化</span></div>
           <div><strong>core-metrics/</strong><span>多样性分析目录</span></div>
         </div>
+      </section>
+
+      <section id="local-status" class="section status-section">
+        <div class="section-heading">
+          <p class="eyebrow">本地任务状态</p>
+          <h2>上传后直接在本机运行</h2>
+          <p>点击“上传并生成配置”后，可以在网页中预览命令或启动分析；状态和日志会显示在下方。</p>
+        </div>
+        <pre id="status-output">尚未上传文件。</pre>
       </section>
 
       <section id="run" class="section run-card">

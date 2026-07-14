@@ -13,13 +13,20 @@ RUN apt-get update \
         ncbi-blast+ \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /workspace
+WORKDIR /app
 
-COPY edna_qiime2_blast_workflow.py /opt/edna-workflow/edna_qiime2_blast_workflow.py
-COPY config.example.yaml /opt/edna-workflow/config.example.yaml
-COPY README.md /opt/edna-workflow/README.md
+COPY edna_qiime2_blast_workflow.py /app/edna_qiime2_blast_workflow.py
+COPY edna_web_server.py /app/edna_web_server.py
+COPY config.example.yaml /app/config.example.yaml
+COPY README.md /app/README.md
+COPY index.html /app/index.html
+COPY styles.css /app/styles.css
+COPY app.js /app/app.js
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1 \
+    EDNA_APP_DIR=/app \
+    EDNA_WORKSPACE=/workspace \
+    PORT=8000
 
-ENTRYPOINT ["python", "/opt/edna-workflow/edna_qiime2_blast_workflow.py"]
-CMD ["--help"]
+EXPOSE 8000
+CMD ["python", "/app/edna_web_server.py"]

@@ -1,14 +1,27 @@
 services:
-  workflow:
+  app:
     build:
       context: .
       args:
         QIIME_IMAGE: quay.io/qiime2/qiime2:2026.4
     image: qiime2-blast-edna:zh
+    ports:
+      - "8000:8000"
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    command: ["run", "--config", "config.yaml"]
+    command: ["python", "/app/edna_web_server.py"]
+
+  workflow:
+    image: qiime2-blast-edna:zh
+    build:
+      context: .
+      args:
+        QIIME_IMAGE: quay.io/qiime2/qiime2:2026.4
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: ["python", "/app/edna_qiime2_blast_workflow.py", "run", "--config", "config.yaml"]
 
   workflow-dry-run:
     image: qiime2-blast-edna:zh
@@ -19,13 +32,4 @@ services:
     working_dir: /workspace
     volumes:
       - ./:/workspace
-    command: ["run", "--config", "config.yaml", "--dry-run"]
-
-  website:
-    image: nginx:1.27-alpine
-    ports:
-      - "8000:80"
-    volumes:
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./styles.css:/usr/share/nginx/html/styles.css:ro
-      - ./app.js:/usr/share/nginx/html/app.js:ro
+    command: ["python", "/app/edna_qiime2_blast_workflow.py", "run", "--config", "config.yaml", "--dry-run"]
