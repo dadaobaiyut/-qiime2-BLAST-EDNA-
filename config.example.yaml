@@ -1,0 +1,45 @@
+# QIIME2 + BLAST 鱼类环境 DNA 工作流配置
+project:
+  name: fish_edna_demo
+  output_dir: results
+  threads: 8
+
+input:
+  # 存放双端 FASTQ 文件的目录，默认使用 Casava 1.8 命名格式。
+  fastq_dir: data/fastq
+  metadata: data/metadata.tsv
+  # 可选：CasavaOneEightSingleLanePerSampleDirFmt 或 PairedEndFastqManifestPhred33V2
+  qiime_input_format: CasavaOneEightSingleLanePerSampleDirFmt
+
+manifest:
+  # 仅当 qiime_input_format 使用 PairedEndFastqManifestPhred33V2 时启用。
+  make_manifest: false
+
+reference:
+  # 提供 fasta 或已有 blast_db_prefix；设置 fasta 时会自动运行 makeblastdb。
+  fasta: reference/fish_12s.fasta
+  blast_db_prefix: null
+  db_type: nucl
+
+dada2:
+  trunc_len_f: 220
+  trunc_len_r: 180
+  trim_left_f: 0
+  trim_left_r: 0
+  chimera_method: consensus
+
+taxonomy:
+  # 表头解析器：simple 使用序列 ID 后的描述作为分类信息；后续可扩展 qiime 表格注释。
+  header_parser: simple
+  unassigned_label: Unassigned
+
+blast:
+  task: blastn
+  max_target_seqs: 10
+  max_evalue: 1e-20
+  min_identity: 97.0
+  min_query_coverage: 90.0
+
+diversity:
+  sampling_depth: 1000
+  metadata_category: group

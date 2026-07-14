@@ -1,0 +1,14 @@
+.git
+__pycache__
+results
+*.qza
+*.qzv
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+data
+reference
+uploads
+web_workflow.log
+config.yaml
