@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QIIME2-BLAST-eDNA 鱼类多样性分析平台</title>
+    <meta name="description" content="基于 QIIME 2 与 BLAST 的鱼类 eDNA 多样性分析工作流网站。" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav" aria-label="主导航">
+        <a class="brand" href="#top" aria-label="QIIME2-BLAST-eDNA 首页">
+          <span class="brand-mark">eDNA</span>
+          <span>QIIME2-BLAST</span>
+        </a>
+        <div class="nav-links">
+          <a href="#workflow">流程</a>
+          <a href="#builder">配置生成器</a>
+          <a href="#outputs">输出</a>
+          <a href="#run">运行</a>
+        </div>
+      </nav>
+
+      <section id="top" class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Fish eDNA Diversity Workflow</p>
+          <h1>一站式鱼类 eDNA 多样性分析网站</h1>
+          <p class="lead">
+            将 QIIME 2 的双端序列导入、DADA2 去噪、ASV 表构建、多样性分析，与本地 BLAST 鱼类参考库注释串联成可复现工作流。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#builder">生成配置</a>
+            <a class="button secondary" href="#run">查看运行命令</a>
+          </div>
+        </div>
+        <aside class="status-card" aria-label="工作流能力概览">
+          <div class="status-header">
+            <span class="pulse"></span>
+            <strong>Workflow Ready</strong>
+          </div>
+          <dl>
+            <div><dt>输入</dt><dd>Paired-end FASTQ + metadata</dd></div>
+            <div><dt>质控</dt><dd>DADA2 ASV denoise</dd></div>
+            <div><dt>注释</dt><dd>BLAST 本地鱼类库</dd></div>
+            <div><dt>结果</dt><dd>Taxa barplot + diversity</dd></div>
+          </dl>
+        </aside>
+      </section>
+    </header>
+
+    <main>
+      <section id="workflow" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Pipeline</p>
+          <h2>从原始 reads 到鱼类群落结构</h2>
+          <p>网站页面用于展示和生成参数；实际计算仍由仓库中的命令行工作流在 QIIME 2/BLAST 环境中执行。</p>
+        </div>
+        <div class="steps">
+          <article><span>01</span><h3>导入 FASTQ</h3><p>支持 Casava 1.8 目录或 manifest 双端格式。</p></article>
+          <article><span>02</span><h3>DADA2 去噪</h3><p>去除低质量 reads 与嵌合体，生成 ASV 表和代表序列。</p></article>
+          <article><span>03</span><h3>BLAST 注释</h3><p>使用本地鱼类参考库按相似度、覆盖度和 e-value 过滤最佳命中。</p></article>
+          <article><span>04</span><h3>多样性分析</h3><p>输出物种组成柱状图、alpha/beta diversity 和 PCoA 结果。</p></article>
+        </div>
+      </section>
+
+      <section id="builder" class="section builder-section">
+        <div class="section-heading">
+          <p class="eyebrow">Config Builder</p>
+          <h2>在线生成 config.yaml</h2>
+          <p>填写常用参数后复制 YAML 到本地 `config.yaml`，再用命令行启动工作流。</p>
+        </div>
+        <div class="builder">
+          <form id="config-form" class="config-form">
+            <label>项目名称<input name="projectName" value="fish_edna_project" /></label>
+            <label>输出目录<input name="outputDir" value="results" /></label>
+            <label>线程数<input name="threads" type="number" min="1" value="8" /></label>
+            <label>FASTQ 目录<input name="fastqDir" value="data/fastq" /></label>
+            <label>Metadata TSV<input name="metadata" value="data/metadata.tsv" /></label>
+            <label>鱼类参考 FASTA<input name="referenceFasta" value="reference/fish_12s.fasta" /></label>
+            <label>Forward 截断长度<input name="truncF" type="number" min="0" value="220" /></label>
+            <label>Reverse 截断长度<input name="truncR" type="number" min="0" value="180" /></label>
+            <label>BLAST identity 阈值<input name="identity" type="number" min="0" max="100" step="0.1" value="97.0" /></label>
+            <label>Query coverage 阈值<input name="coverage" type="number" min="0" max="100" step="0.1" value="90.0" /></label>
+            <label>抽平深度<input name="samplingDepth" type="number" min="1" value="1000" /></label>
+          </form>
+          <div class="yaml-panel">
+            <div class="panel-title"><span>config.yaml</span><button id="copy-config" type="button">复制</button></div>
+            <pre id="yaml-output" aria-live="polite"></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="outputs" class="section outputs">
+        <div class="section-heading">
+          <p class="eyebrow">Results</p>
+          <h2>核心输出文件</h2>
+        </div>
+        <div class="output-grid">
+          <div><strong>table.qza</strong><span>ASV feature table</span></div>
+          <div><strong>rep-seqs.qza</strong><span>代表序列</span></div>
+          <div><strong>blast/asv_vs_fish.tsv</strong><span>BLAST 原始命中</span></div>
+          <div><strong>blast/taxonomy.tsv</strong><span>QIIME taxonomy 表</span></div>
+          <div><strong>taxa-bar-plots.qzv</strong><span>物种组成可视化</span></div>
+          <div><strong>core-metrics/</strong><span>多样性分析目录</span></div>
+        </div>
+      </section>
+
+      <section id="run" class="section run-card">
+        <div>
+          <p class="eyebrow">Run Locally</p>
+          <h2>复制配置后在本地环境运行</h2>
+          <p>网站负责参数整理和说明；大型测序计算建议在服务器、工作站或 HPC 的 QIIME 2 conda 环境中完成。</p>
+        </div>
+        <pre><code>python edna_qiime2_blast_workflow.py run --config config.yaml --dry-run
+python edna_qiime2_blast_workflow.py run --config config.yaml</code></pre>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>QIIME2-BLAST-eDNA</span>
+      <span>面向鱼类 eDNA 扩增子数据的可复现分析入口</span>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -19,13 +19,16 @@
 ```text
 .
 ├── README.md
+├── index.html
+├── styles.css
+├── app.js
 ├── config.example.yaml
 └── edna_qiime2_blast_workflow.py
 ```
 
 ## 环境要求
 
-请在已经安装 QIIME 2、BLAST+ 和 Python 依赖的环境中运行。推荐用 conda/mamba：
+请在已经安装 QIIME 2 和 BLAST+ 的环境中运行；工作流脚本仅使用 Python 标准库。推荐用 conda/mamba：
 
 ```bash
 mamba create -n edna-fish -c qiime2 -c conda-forge -c bioconda qiime2 blast
@@ -73,6 +76,17 @@ ACGT...
 ```
 
 首次运行时工作流会自动执行 `makeblastdb`。如果已经建好库，也可以在配置中直接提供 BLAST 数据库前缀。
+
+
+## 网站界面
+
+本仓库现在提供静态网站入口，可用于展示流程并在线生成 `config.yaml`：
+
+```bash
+python -m http.server 8000
+```
+
+然后在浏览器打开 `http://localhost:8000`。网站不会在浏览器中直接运行大型测序计算，而是帮助整理参数、复制配置，并指导用户在本地或服务器 QIIME 2 环境中运行命令行工作流。
 
 ## 快速开始
 
