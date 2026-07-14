@@ -78,6 +78,40 @@ ACGT...
 首次运行时工作流会自动执行 `makeblastdb`。如果已经建好库，也可以在配置中直接提供 BLAST 数据库前缀。
 
 
+
+## Docker 运行方式
+
+如果你主要使用 Docker，可以不用在宿主机安装 QIIME 2 和 BLAST+。本仓库提供 `Dockerfile` 和 `docker-compose.yml`：
+
+```bash
+# 1. 构建包含 QIIME 2 工作流脚本和 BLAST+ 的镜像
+docker build -t qiime2-blast-edna:zh .
+
+# 2. 复制并修改配置文件
+cp config.example.yaml config.yaml
+
+# 3. 预览容器内将要执行的命令
+docker run --rm -it -v "$PWD":/workspace -w /workspace qiime2-blast-edna:zh run --config config.yaml --dry-run
+
+# 4. 正式运行分析
+docker run --rm -it -v "$PWD":/workspace -w /workspace qiime2-blast-edna:zh run --config config.yaml
+```
+
+也可以使用 Docker Compose：
+
+```bash
+# 启动网页配置生成器，浏览器打开 http://localhost:8000
+docker compose up website
+
+# 预览工作流命令
+docker compose run --rm workflow-dry-run
+
+# 正式运行工作流
+docker compose run --rm workflow
+```
+
+容器会把当前项目目录挂载到 `/workspace`，因此 `config.yaml` 中的 `data/fastq`、`data/metadata.tsv`、`reference/fish_12s.fasta` 等路径应相对于仓库根目录。默认基础镜像为 `quay.io/qiime2/qiime2:2026.4`，如需固定其他 QIIME 2 版本，可在构建时传入 `--build-arg QIIME_IMAGE=...`。
+
 ## 网站界面
 
 本仓库现在提供静态网站入口，可用于展示流程并在线生成 `config.yaml`：
